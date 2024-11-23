@@ -23,8 +23,18 @@ public class BeritaController {
     }
 
     @GetMapping
-    public List<Berita> getAllBerita() {
-        return beritaService.findAll();
+    public ResponseEntity<List<Berita>> getAllBerita() {
+        List<Berita> beritaList = beritaService.findAll();
+
+        // Menambahkan URL gambar pada setiap berita
+        String baseUrl = "http://localhost:8081/uploads/"; // Ganti dengan URL sesuai kebutuhan
+        for (Berita berita : beritaList) {
+            if (berita.getGambar() != null) {
+                berita.setGambar(baseUrl + berita.getGambar());
+            }
+        }
+
+        return ResponseEntity.ok(beritaList);
     }
 
     @GetMapping("/{id}")
