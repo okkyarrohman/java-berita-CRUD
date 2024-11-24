@@ -1,6 +1,8 @@
 package com.domain.berita.controller;
 
 import com.domain.berita.model.Berita;
+import com.domain.berita.response.PaginateResponse;
+import com.domain.berita.response.SuccessResponse;
 import com.domain.berita.service.BeritaService;
 import com.domain.berita.service.FileStorageService;
 import org.springframework.http.HttpStatus;
@@ -8,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/berita")
@@ -23,18 +23,10 @@ public class BeritaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Berita>> getAllBerita() {
-        List<Berita> beritaList = beritaService.findAll();
-
-        // Menambahkan URL gambar pada setiap berita
-        String baseUrl = "http://localhost:8081/uploads/"; // Ganti dengan URL sesuai kebutuhan
-        for (Berita berita : beritaList) {
-            if (berita.getGambar() != null) {
-                berita.setGambar(baseUrl + berita.getGambar());
-            }
-        }
-
-        return ResponseEntity.ok(beritaList);
+    public PaginateResponse<?> getPaginatedBerita(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int perPage) {
+        return beritaService.findPaginate(page, perPage);
     }
 
     @GetMapping("/{id}")
@@ -45,27 +37,23 @@ public class BeritaController {
 
     @PostMapping
     public ResponseEntity<Berita> createBerita(
-            @Validated @RequestPart("judul") String judul, // Field 'judul' sebagai String
-            @Validated @RequestPart("konten") String konten, // Field 'konten' sebagai String
-            @Validated @RequestPart("penulis") String penulis, // Field 'penulis' sebagai String
-            @RequestPart("file") MultipartFile file) { // Field 'file' sebagai file upload
+            @Validated @RequestPart("judul") String judul,
+            @Validated @RequestPart("konten") String konten,
+            @Validated @RequestPart("penulis") String penulis,
+            @RequestPart("file") MultipartFile file) {
 
-        // Membuat objek 'Berita' baru
         Berita berita = new Berita();
         berita.setJudul(judul);
         berita.setKonten(konten);
         berita.setPenulis(penulis);
 
-        // Menyimpan file jika ada
         if (file != null && !file.isEmpty()) {
             String fileName = fileStorageService.storeFile(file); // Menyimpan file dan mendapatkan nama file
             berita.setGambar(fileName); // Menyimpan nama file ke field 'gambar'
         }
 
-        // Menyimpan berita ke database
         Berita savedBerita = beritaService.save(berita);
 
-        // Mengembalikan response dengan status 201 Created
         return new ResponseEntity<>(savedBerita, HttpStatus.CREATED);
     }
 
