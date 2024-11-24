@@ -25,8 +25,10 @@ public class BeritaController {
     @GetMapping
     public PaginateResponse<?> getPaginatedBerita(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int perPage) {
-        return beritaService.findPaginate(page, perPage);
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(required = false) String search) {
+
+        return beritaService.findPaginate(page, perPage, search);
     }
 
     @GetMapping("/{id}")

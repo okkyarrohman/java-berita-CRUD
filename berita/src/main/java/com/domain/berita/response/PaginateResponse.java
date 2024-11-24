@@ -1,18 +1,15 @@
 package com.domain.berita.response;
 
-import java.util.Map;
-
 public class PaginateResponse<T> {
     private Meta meta;
     private Pagination paginate;
     private T data;
-    private Map<String, Boolean> permission;
 
-    public PaginateResponse(int status, String message, Pagination paginate, T data, Map<String, Boolean> permission) {
+    public PaginateResponse(int status, String message, Pagination paginate, T data) {
         this.meta = new Meta(status, message);
         this.paginate = paginate;
         this.data = data;
-        this.permission = permission;
+
     }
 
     // Getters and Setters
@@ -38,14 +35,6 @@ public class PaginateResponse<T> {
 
     public void setData(T data) {
         this.data = data;
-    }
-
-    public Map<String, Boolean> getPermission() {
-        return permission;
-    }
-
-    public void setPermission(Map<String, Boolean> permission) {
-        this.permission = permission;
     }
 
     // Inner class for Meta
